@@ -1,0 +1,12 @@
+[Core]
+Name = related_posts
+Module = related_posts
+
+[Nikola]
+PluginCategory = SignalHandler
+
+[Documentation]
+Author = Cristhian Ernesto Lugo Dorta, Ahmed Rodriguez
+Version = 0.1.0
+Website = https://plugins.getnikola.com/#related_posts
+Description = Add a list of related posts, automatically selected based on their content.
