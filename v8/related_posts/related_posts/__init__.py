@@ -41,8 +41,43 @@ class RelatedPosts(SignalHandler):
                 lang=lang,
                 cache_dir=self.site.config["CACHE_FOLDER"],
             )
+
+            posts_by_slug = {}
+            for p in self.site.posts:
+                slug = p.meta("slug", lang)
+                if slug:
+                    posts_by_slug[slug] = p
+
             for post, recommendations in related.items():
-                post.related_posts[lang] = recommendations
+                manual = post.meta("related_manual", lang)
+
+                if manual and manual.strip().lower() == "none":
+                    post.related_posts[lang] = []
+                    continue
+
+                if manual:
+                    slugs = list(dict.fromkeys(s.strip() for s in manual.split(",") if s.strip()))
+                    own_slug = post.meta("slug", lang)
+                    missing = [s for s in slugs if s not in posts_by_slug and s != own_slug]
+
+                    if missing:
+                        self.logger.warning(
+                            "related_manual: slugs not found for post '%s' (lang=%s): %s",
+                            own_slug, lang, ", ".join(missing),
+                        )
+
+                    if own_slug in slugs:
+                        self.logger.warning(
+                            "related_manual: post '%s' references itself; ignoring", own_slug
+                        )
+
+                    post.related_posts[lang] = [
+                        posts_by_slug[s]
+                        for s in slugs
+                        if s in posts_by_slug and s != own_slug
+                    ][:count]
+                else:
+                    post.related_posts[lang] = recommendations
 
     def _inject_related_context(self, event):
         if event.get("site") is not self.site:
