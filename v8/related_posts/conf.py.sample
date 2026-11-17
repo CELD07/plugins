@@ -1,0 +1,9 @@
+# Maximum number of related posts to display per post.
+RELATED_POSTS_COUNT = 5
+
+# Section titles for each language.
+RELATED_POSTS_TITLES = {
+    "en": "Related posts",
+    "es": "Artículos relacionados",
+    "de": "Ähnliche Beiträge",
+}
